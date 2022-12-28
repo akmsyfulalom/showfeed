@@ -13,16 +13,16 @@ const PostCard = () => {
         queryFn: async () => {
             const res = await fetch('http://localhost:5000/posts')
             const data = await res.json()
-            console.log(data);
-            return data
+            return data.reverse();
         }
 
     })
 
     return (
         <div>
+            <p className='text-center mt-2'>Recent posts</p>
             {
-                posts?.map(post => <div className="card md:w-1/2  bg-base-100 shadow-xl md:mx-auto mx-5 my-2 ">
+                posts?.map(post => <div key={post?._id} className="card md:w-1/2  bg-base-100 shadow-xl md:mx-auto mx-5 my-2 ">
                     <div className="card-body">
                         <div className='flex items-center justify-between gap-4'>
                             <div className='flex '>
@@ -44,7 +44,7 @@ const PostCard = () => {
 
                         <p>{post?.article}</p>
                     </div>
-                    <figure><img src={post?.img} alt="Shoes" /></figure>
+                    <figure><img src={post?.img} alt="PostImage" /></figure>
 
 
                     <div className="divider"></div>
