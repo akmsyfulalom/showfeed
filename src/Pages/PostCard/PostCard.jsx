@@ -20,7 +20,7 @@ const PostCard = () => {
 
     return (
         <div>
-            <p className='text-center mt-2'>Recent posts</p>
+            <p className='text-center mt-2 text-slate-500'>Recent posts</p>
             {
                 posts?.map(post => <div key={post?._id} className="card md:w-1/2  bg-base-100 shadow-xl md:mx-auto mx-5 my-2 ">
                     <div className="card-body">

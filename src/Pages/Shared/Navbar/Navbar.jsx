@@ -4,12 +4,21 @@ import { Link } from 'react-router-dom';
 const Navbar = () => {
 
     const menuItems = <>
-        <li><Link>My Feed</Link></li>
+        <li><Link to="/">My Feed</Link></li>
 
-        <li><Link>Popular Posts</Link></li>
-        <li><Link>Message</Link></li>
+        <li><Link to="/popularPosts">Popular Posts</Link></li>
+        <li><Link to="/message">Message</Link></li>
 
 
+    </>
+
+    const userInfoMenu = <>
+        <li><Link to="/profile" >Profile</Link></li>
+        <li><Link to="/about">About</Link></li>
+        <li><Link to="/feedback">Feedback</Link></li>
+        <li><Link to="/support">Support</Link></li>
+        <li><Link to="/privacyPolicy">Privacy Policy</Link></li>
+        <li><Link >Logout</Link></li>
     </>
 
 
@@ -40,14 +49,7 @@ const Navbar = () => {
                             </div>
                         </label>
                         <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
-                            <li>
-                                <Link className="justify-between">
-                                    Profile
-
-                                </Link>
-                            </li>
-                            <li><Link>About</Link></li>
-                            <li><Link>Logout</Link></li>
+                            {userInfoMenu}
                         </ul>
                     </div>
                 </div>
