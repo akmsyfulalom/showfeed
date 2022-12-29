@@ -5,6 +5,7 @@ import './signup.css';
 
 const SignUp = () => {
     const { createUser, user } = useContext(AuthContext)
+    console.log(user)
     const [error, setError] = useState('')
 
     const imageHostKey = process.env.REACT_APP_imgbb_key;

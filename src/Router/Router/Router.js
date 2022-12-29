@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
+import FrontLayout from "../../Layout/FrontLayout/FrontLayout";
 import Main from "../../Layout/MainLayout/Main";
-import Login from "../../Login/Login/Login";
 import Feedback from "../../Pages/Conpany/Feedback/Feedback";
 import PrivacyPolicy from "../../Pages/Conpany/PrivacyPolicy/PrivacyPolicy";
 import Support from "../../Pages/Conpany/Support/Support";
@@ -9,6 +9,7 @@ import Message from "../../Pages/Message/Message";
 import PopularPosts from "../../Pages/PopularPosts/PopularPosts";
 import About from "../../Pages/UserInfo/About/About";
 import MyProfile from "../../Pages/UserInfo/MyProfile/MyProfile";
+import PrivateRouter from "./PrivateRouter/PrivateRouter";
 
 export const router = createBrowserRouter([
     {
@@ -17,41 +18,43 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <Home />,
+                element: <PrivateRouter><Home /></PrivateRouter>
             },
             {
                 path: "/popularPosts",
-                element: <PopularPosts></PopularPosts>
+                element: <PrivateRouter><PopularPosts></PopularPosts></PrivateRouter>
             },
             {
                 path: "/message",
-                element: <Message></Message>
+                element: <PrivateRouter><Message></Message></PrivateRouter>
             },
             {
                 path: "/profile",
-                element: <MyProfile></MyProfile>
+                element: <PrivateRouter><MyProfile></MyProfile></PrivateRouter>
             },
             {
                 path: "/about",
-                element: <About></About>
+                element: <PrivateRouter><About></About></PrivateRouter>
             },
             {
                 path: "/feedback",
-                element: <Feedback></Feedback>
+                element: <PrivateRouter><Feedback></Feedback></PrivateRouter>
             },
             {
                 path: "/support",
-                element: <Support></Support>
+                element: <PrivateRouter><Support></Support></PrivateRouter>
             },
             {
                 path: "/privacyPolicy",
-                element: <PrivacyPolicy></PrivacyPolicy>
+                element: <PrivacyPolicy><PrivacyPolicy></PrivacyPolicy></PrivacyPolicy>
             },
-            {
-                path: "/login",
-                element: <Login></Login>
-            }
+
         ]
+    },
+    {
+        path: "/login",
+        element: <FrontLayout></FrontLayout>,
+
     },
     {
         path: "/dashboard",
