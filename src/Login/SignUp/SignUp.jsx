@@ -4,8 +4,8 @@ import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
 import './signup.css';
 
 const SignUp = () => {
-    const { createUser, user } = useContext(AuthContext)
-    console.log(user)
+    const { createUser } = useContext(AuthContext)
+
     const [error, setError] = useState('')
 
     const imageHostKey = process.env.REACT_APP_imgbb_key;
@@ -13,7 +13,7 @@ const SignUp = () => {
     const handleSignUp = (event) => {
         event.preventDefault();
         const form = event.target;
-        const name = form.name.value;
+        const displayName = form.name.value;
         const email = form.email.value;
         const password = form.password.value;
         const university = form.university.value;
@@ -21,7 +21,7 @@ const SignUp = () => {
         const userRole = form.role.value;
         const profileImage = form.userProfileImage.files[0]
 
-        console.log(name, email, password, university, address, profileImage, userRole)
+        console.log(displayName, email, password, university, address, profileImage, userRole)
 
         const formData = new FormData();
         formData.append('image', profileImage);
@@ -34,7 +34,7 @@ const SignUp = () => {
             .then(imageData => {
                 if (imageData.success) {
                     const userInfo = {
-                        displayName: name,
+                        displayName: displayName,
                         email: email,
                         photoURL: imageData.data.url,
                         university: university,
@@ -59,9 +59,12 @@ const SignUp = () => {
                 }
             })
 
+
+
         createUser(email, password)
             .then(result => {
                 const user = result.user;
+                console.log(user);
                 form.reset();
                 toast.success(' successfully created')
             })

@@ -7,6 +7,7 @@ import Support from "../../Pages/Conpany/Support/Support";
 import Home from "../../Pages/Home/Home";
 import Message from "../../Pages/Message/Message";
 import PopularPosts from "../../Pages/PopularPosts/PopularPosts";
+import PostView from "../../Pages/PostCard/PostView/PostView";
 import About from "../../Pages/UserInfo/About/About";
 import MyProfile from "../../Pages/UserInfo/MyProfile/MyProfile";
 import PrivateRouter from "./PrivateRouter/PrivateRouter";
@@ -46,8 +47,14 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/privacyPolicy",
-                element: <PrivacyPolicy><PrivacyPolicy></PrivacyPolicy></PrivacyPolicy>
+                element: <PrivateRouter><PrivacyPolicy></PrivacyPolicy></PrivateRouter>
             },
+            {
+                path: '/post/:id',
+                element: <PrivateRouter><PostView></PostView></PrivateRouter>,
+                loader: ({ params }) => fetch(`http://localhost:5000/post/${params.id}`),
+
+            }
 
         ]
     },

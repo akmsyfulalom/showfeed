@@ -1,14 +1,31 @@
-import React from 'react';
-import { FcLike } from 'react-icons/fc';
+import React, { useContext, useState } from 'react';
+import { GrLike } from 'react-icons/gr'
 import { CgComment } from 'react-icons/cg';
 import { IoIosShareAlt } from 'react-icons/io';
 import { useQuery } from '@tanstack/react-query';
 import { BsThreeDots } from 'react-icons/bs';
+import { useEffect } from 'react';
+import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
+import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 
 const PostCard = () => {
+    const { user } = useContext(AuthContext);
+    const [loginUser, setLoinUser] = useState({})
+    const [commentDate, setCommentDate] = useState(new Date())
 
-    const { data: posts = [] } = useQuery({
+
+    useEffect(() => {
+        if (user?.email) {
+            fetch(`http://localhost:5000/user/${user?.email}`)
+                .then(res => res.json())
+                .then(data => setLoinUser(data))
+
+        }
+    }, [user?.email])
+
+    const { data: posts = [], } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
             const res = await fetch('http://localhost:5000/posts')
@@ -16,7 +33,90 @@ const PostCard = () => {
             return data.reverse();
         }
 
+    });
+
+    const { data: comments = [], refetch } = useQuery({
+        queryKey: ['comments'],
+        queryFn: async () => {
+            const res = await fetch('http://localhost:5000/comments')
+            const data = await res.json()
+            console.log(data);
+            return data;
+        }
     })
+
+    // const { data: likes = 0 } = useQuery({
+    //     queryKey: ['likes'],
+    //     queryFn: async () => {
+    //         const res = await fetch('http://localhost:5000/likes')
+    //         const data = await res.json()
+    //         return data
+    //     }
+    // })
+
+    // console.log(likes[0].likes);
+
+    // const handleLikePost = id => {
+    //     fetch(`http://localhost:5000/likes?id=${id}`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     })
+    //         .then(res => res.json())
+    //         .then(data => console.log(data))
+    //     console.log(id);
+    // }
+
+    const handleCommentPost = (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const postId = form.postId.value;
+
+        const name = form.name.value;
+        const userImage = form.userImage.value;
+        const date = form.date.value;
+        const comment = form.comment.value;
+        console.log(postId, name, userImage, date, comment,)
+
+        const addComment = {
+            id: postId,
+            name,
+            userImage,
+            date,
+            comment,
+            time: new Date()
+        }
+
+        fetch(`http://localhost:5000/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(addComment)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.acknowledged) {
+                    event.target.reset();
+                    console.log(data);
+                    refetch()
+                }
+            })
+    };
+
+
+    const handleLikePost = (id) => {
+        fetch(`http://localhost:5000/like/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user: user.uid })
+        }).then(res => res.json()).then(data => { console.log(data) })
+
+    }
+
 
     return (
         <div>
@@ -28,12 +128,12 @@ const PostCard = () => {
                             <div className='flex '>
                                 <div className="avatar">
                                     <div className="md:w-12 w-8 rounded-full">
-                                        <img src="https://placeimg.com/192/192/people" alt='' />
+                                        <img src={post.userImage} alt='' />
                                     </div>
 
                                 </div>
                                 <div className='ml-2'>
-                                    <h2 className="card-title ">Your name</h2>
+                                    <h2 className="card-title ">{post.userName}</h2>
                                     <p className='-mt-1 ml-1 text-xs'>Dec-22-2022</p>
                                 </div>
                             </div>
@@ -43,15 +143,54 @@ const PostCard = () => {
                         </div>
 
                         <p>{post?.article}</p>
+                        <div className="card-actions justify-start">
+                            <Link to={`/post/${post?._id}`} className="   font-bold">Read More</Link>
+                        </div>
                     </div>
                     <figure><img src={post?.img} alt="PostImage" /></figure>
 
-
-                    <div className="divider"></div>
+                    <div>
+                        <span></span>
+                    </div>
+                    <div className="divider my-1"></div>
                     <div className='flex justify-around pb-4'>
-                        <div className='flex gap-1'><FcLike className='text-xl' /><p> React</p></div>
+                        <div onClick={() => handleLikePost(post._id)} className='flex gap-1 cursor-pointer'><GrLike className='text-xl' /><p>Like</p></div>
                         <div className='flex gap-1'><CgComment className='text-xl' /><p> Comment</p></div>
                         <div className='flex gap-1'><IoIosShareAlt className='text-xl' /><p> Share</p></div>
+                    </div>
+                    <div className="divider -mt-4"></div>
+                    <div>
+                        <form onSubmit={handleCommentPost} className='flex gap-1 mb-4 mx-1'>
+
+                            <input name='postId' defaultValue={post?._id} type="text" hidden />
+                            <input name='name' defaultValue={loginUser?.displayName} type="text" hidden />
+                            <input name='userImage' defaultValue={loginUser?.photoURL} type="text" hidden />
+                            <input name='comment' type="text" placeholder="Write your comment" required className="relative rounded-full input input-bordered w-full" />
+                            <input name='date' defaultValue={format(commentDate, "P")} type="text" hidden />
+                            <button type='submit' className={`btn btn-active btn-primary rounded-full no-animation absolute right-1`}>Comment</button>
+                        </form>
+                        <div>
+                            {/* postComment.comment === '' */}
+                            {
+                                comments.filter(c => c.id === post._id).map(comment => <div key={comment?._id} className='bg-base-300 py-2 mt-2 mb-3 rounded-md'>
+                                    <div className=' mx-2'>
+                                        <div className='flex items-center '>
+                                            <div className="avatar">
+                                                <div className="md:w-8 w-6 rounded-full ">
+                                                    <img src={comment.userImage} alt='profile' />
+                                                </div>
+                                            </div>
+                                            <h3 className='md:text-1xl font-bold ml-1'>{comment.name}</h3>
+                                        </div>
+                                        <div className='lg:ml-8 md:ml-8 ml-7'>
+                                            <p className='-mt-2'>{comment.comment}</p>
+                                            <p className='text-xs'>Dec-30-2022</p>
+                                        </div>
+
+                                    </div>
+                                </div>)
+                            }
+                        </div>
 
                     </div>
                 </div>)

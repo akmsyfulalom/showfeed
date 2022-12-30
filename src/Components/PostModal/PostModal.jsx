@@ -2,11 +2,27 @@ import React from 'react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
+import { useContext } from 'react';
+import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
+import { useEffect } from 'react';
+
 
 
 
 const PostModal = () => {
-    const [postTime, setPostTime] = useState(new Date());
+    const { user } = useContext(AuthContext)
+    const [postTime] = useState(new Date());
+    const [loginUser, setLoginUser] = useState({});
+
+
+    useEffect(() => {
+        if (user?.email) {
+            fetch(`http://localhost:5000/user/${user?.email}`)
+                .then(res => res.json())
+                .then(data => setLoginUser(data))
+        }
+    }, [user?.email])
+
 
     const imgHostKey = process.env.REACT_APP_imgbb_key;
 
@@ -31,7 +47,11 @@ const PostModal = () => {
                 if (imageData.success) {
                     const addPost = {
                         article: articles,
+                        userId: user?.uid,
                         img: imageData.data.url,
+                        userImage: loginUser.photoURL,
+                        userName: loginUser.displayName,
+                        likes: [{ user: user.uid }],
                         date: postDate,
                         time: posTime
                     }
@@ -65,9 +85,9 @@ const PostModal = () => {
                 <div className="modal-box">
                     <div className="avatar flex items-center ">
                         <div className="md:w-12 w-8 rounded-full">
-                            <img src="https://placeimg.com/192/192/people" alt='' />
+                            <img src={loginUser?.photoURL} alt='' />
                         </div>
-                        <h3 className='ml-2 md:text-2xl  text-xl font-bold'>Name</h3>
+                        <h3 className='ml-2 md:text-2xl  text-xl font-bold'>{loginUser?.displayName}</h3>
                         <label htmlFor="post-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
                     </div>
                     <form onSubmit={handlePostData}>

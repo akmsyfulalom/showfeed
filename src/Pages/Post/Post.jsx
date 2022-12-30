@@ -1,9 +1,11 @@
+
 import React from 'react';
 import PostModal from '../../Components/PostModal/PostModal';
 
 
 
 const Post = () => {
+
     return (
         <div>
             <div className="card md:w-1/2  bg-base-100 shadow-xl md:mx-auto mx-5 mt-2">

@@ -4,10 +4,7 @@ import Login from '../../Login/Login/Login';
 const FrontLayout = () => {
     return (
         <div>
-
             <Login></Login>
-
-
         </div>
     );
 };
