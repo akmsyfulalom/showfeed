@@ -18,17 +18,17 @@ const PostView = () => {
 
     useEffect(() => {
         if (user?.email) {
-            fetch(`http://localhost:5000/user/${user?.email}`)
+            fetch(`https://showfeed-server.vercel.app/user/${user?.email}`)
                 .then(res => res.json())
                 .then(data => setLoginUser(data))
         }
     }, [user?.email])
 
 
-    const { data: comments = [], refetch } = useQuery({
-        queryKey: ['comments'],
+    const { data: viewPostComments = [], refetch } = useQuery({
+        queryKey: ['viewPostComments'],
         queryFn: async () => {
-            const res = await fetch('http://localhost:5000/comments')
+            const res = await fetch(`https://showfeed-server.vercel.app/viewPostComments?id=${postView._id}`)
             const data = await res.json()
             console.log(data);
             return data;
@@ -64,7 +64,7 @@ const PostView = () => {
             time: new Date()
         }
 
-        fetch(`http://localhost:5000/comments`, {
+        fetch(`https://showfeed-server.vercel.app/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -103,7 +103,7 @@ const PostView = () => {
                                 <figure><img src={loginUser?.photoURL} alt="post img" /></figure>
                                 <div className="">
 
-                                    <p>{postView?.article}</p>
+
 
                                 </div>
                             </div>
@@ -122,7 +122,7 @@ const PostView = () => {
 
                             </div>
                             <div className='md:pl-16 pl-8'>
-                                <p className='pl-2 md:-mt-10 -mt-5'>Post date: 23-12-2022</p>
+                                <p className='pl-2 md:-mt-10 -mt-5'>{postView.date}</p>
                             </div>
                             <div>
                                 <h1 className='mt-2 mb-5 font-semibold text-xl'>{postView?.article}</h1>
@@ -131,7 +131,7 @@ const PostView = () => {
                                 <div><p className='text-center'>1</p>
                                     <button className='flex items-center '> <FaHandPointRight className='mr-2 text-xl'></FaHandPointRight><p>Like</p></button>
                                 </div>
-                                <div><p className='text-center'>{comments.length}</p>
+                                <div><p className='text-center'>{viewPostComments.length}</p>
                                     <button className='flex items-center '> <FaComment className='mr-2 text-xl'></FaComment><p>Comment</p></button>
                                 </div>
                                 <div><p className='text-center'>1</p>
@@ -155,7 +155,7 @@ const PostView = () => {
                             </div>
                             <div>
                                 {
-                                    comments?.map(comment => <div key={comment._id} className='mb-5' >
+                                    viewPostComments?.map(comment => <div key={comment._id} className='mb-5' >
                                         <div className='flex items-center'>
                                             <div className="avatar">
                                                 <div className=" mr-1 w-4 rounded-full  ">

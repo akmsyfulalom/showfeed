@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import LoadingSpinner from '../../Components/LoadingSpinner/LoadingSpinner';
 
 
 const PostCard = () => {
@@ -16,57 +17,38 @@ const PostCard = () => {
     const [commentDate, setCommentDate] = useState(new Date())
 
 
+
     useEffect(() => {
         if (user?.email) {
-            fetch(`http://localhost:5000/user/${user?.email}`)
+            fetch(`https://showfeed-server.vercel.app/user/${user?.email}`)
                 .then(res => res.json())
                 .then(data => setLoinUser(data))
 
         }
     }, [user?.email])
 
-    const { data: posts = [], } = useQuery({
+    const { data: posts = [], refetch } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const res = await fetch('http://localhost:5000/posts')
+            const res = await fetch('https://showfeed-server.vercel.app/posts')
             const data = await res.json()
             return data.reverse();
         }
 
     });
 
-    const { data: comments = [], refetch } = useQuery({
+    const { data: comments = [], isLoading, } = useQuery({
         queryKey: ['comments'],
         queryFn: async () => {
-            const res = await fetch('http://localhost:5000/comments')
+            const res = await fetch('https://showfeed-server.vercel.app/comments')
             const data = await res.json()
-            console.log(data);
+
             return data;
         }
     })
 
-    // const { data: likes = 0 } = useQuery({
-    //     queryKey: ['likes'],
-    //     queryFn: async () => {
-    //         const res = await fetch('http://localhost:5000/likes')
-    //         const data = await res.json()
-    //         return data
-    //     }
-    // })
 
-    // console.log(likes[0].likes);
 
-    // const handleLikePost = id => {
-    //     fetch(`http://localhost:5000/likes?id=${id}`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => console.log(data))
-    //     console.log(id);
-    // }
 
     const handleCommentPost = (event) => {
         event.preventDefault();
@@ -88,7 +70,7 @@ const PostCard = () => {
             time: new Date()
         }
 
-        fetch(`http://localhost:5000/comments`, {
+        fetch(`https://showfeed-server.vercel.app/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -98,25 +80,35 @@ const PostCard = () => {
             .then(res => res.json())
             .then(data => {
                 if (data.acknowledged) {
+                    refetch()
                     event.target.reset();
                     console.log(data);
-                    refetch()
+
                 }
             })
     };
 
 
     const handleLikePost = (id) => {
-        fetch(`http://localhost:5000/like/${id}`, {
+        fetch(`https://showfeed-server.vercel.app/like/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ user: user.uid })
-        }).then(res => res.json()).then(data => { console.log(data) })
+        }).then(res => res.json()).then(data => {
 
+            // console.log(data)
+            refetch()
+        })
+
+    };
+
+    // const like = likes.map(like => console.log(like._id))
+
+    if (isLoading) {
+        return <LoadingSpinner></LoadingSpinner>
     }
-
 
     return (
         <div>
@@ -134,7 +126,7 @@ const PostCard = () => {
                                 </div>
                                 <div className='ml-2'>
                                     <h2 className="card-title ">{post.userName}</h2>
-                                    <p className='-mt-1 ml-1 text-xs'>Dec-22-2022</p>
+                                    <p className='-mt-1 ml-1 text-xs'>{post.date}</p>
                                 </div>
                             </div>
                             <div >
@@ -147,14 +139,33 @@ const PostCard = () => {
                             <Link to={`/post/${post?._id}`} className="   font-bold">Read More</Link>
                         </div>
                     </div>
-                    <figure><img src={post?.img} alt="PostImage" /></figure>
+                    <figure><img src={post?.img} alt="PostImage" className='max-h-96' /></figure>
 
                     <div>
                         <span></span>
                     </div>
+                    <div className='flex justify-between lg:mx-20 md:mx-10 mx-5'>
+
+                        <p>{post.likes?.length === 0 ? '' : post.likes?.length} {post.likes?.length === 1 ? "Like" : "Likes"}</p>
+
+
+                        <div className='flex gap-1'>
+                            <p>
+                                {
+                                    comments?.filter(c => c.id === post._id).length === 0 ? '' : comments?.filter(c => c.id === post._id).length
+                                }
+
+                            </p>
+                            <p>
+                                {
+                                    comments?.filter(c => c.id === post._id).length === 1 ? "Comment" : "Comments"
+                                }
+                            </p>
+                        </div>
+                    </div>
                     <div className="divider my-1"></div>
                     <div className='flex justify-around pb-4'>
-                        <div onClick={() => handleLikePost(post._id)} className='flex gap-1 cursor-pointer'><GrLike className='text-xl' /><p>Like</p></div>
+                        <div onClick={() => handleLikePost(post._id)} className='flex gap-1 cursor-pointer'><GrLike /><p className='select-none'>Like</p></div>
                         <div className='flex gap-1'><CgComment className='text-xl' /><p> Comment</p></div>
                         <div className='flex gap-1'><IoIosShareAlt className='text-xl' /><p> Share</p></div>
                     </div>
@@ -174,6 +185,7 @@ const PostCard = () => {
                             {
                                 comments.filter(c => c.id === post._id).map(comment => <div key={comment?._id} className='bg-base-300 py-2 mt-2 mb-3 rounded-md'>
                                     <div className=' mx-2'>
+
                                         <div className='flex items-center '>
                                             <div className="avatar">
                                                 <div className="md:w-8 w-6 rounded-full ">
@@ -181,6 +193,7 @@ const PostCard = () => {
                                                 </div>
                                             </div>
                                             <h3 className='md:text-1xl font-bold ml-1'>{comment.name}</h3>
+
                                         </div>
                                         <div className='lg:ml-8 md:ml-8 ml-7'>
                                             <p className='-mt-2'>{comment.comment}</p>

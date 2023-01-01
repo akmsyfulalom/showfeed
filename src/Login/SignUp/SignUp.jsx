@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
 import './signup.css';
 
@@ -8,6 +9,7 @@ const SignUp = () => {
 
     const [error, setError] = useState('')
 
+    const navigate = useNavigate()
     const imageHostKey = process.env.REACT_APP_imgbb_key;
 
     const handleSignUp = (event) => {
@@ -41,7 +43,7 @@ const SignUp = () => {
                         address: address,
                         role: userRole
                     }
-                    fetch('http://localhost:5000/users', {
+                    fetch('https://showfeed-server.vercel.app/users', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json'
@@ -51,7 +53,7 @@ const SignUp = () => {
                         .then(res => res.json())
                         .then(data => {
                             if (data.acknowledged) {
-
+                                navigate('/')
                                 event.target.reset();
                                 console.log(data);
                             }

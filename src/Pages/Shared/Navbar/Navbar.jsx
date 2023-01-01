@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../../Contexts/AuthProvider/AuthProvider';
@@ -8,6 +8,18 @@ import Login from '../../../Login/Login/Login';
 const Navbar = () => {
     const { user, LogOut } = useContext(AuthContext);
     console.log(user)
+    const [loginUser, setLoinUser] = useState({})
+
+
+
+    useEffect(() => {
+        if (user?.email) {
+            fetch(`https://showfeed-server.vercel.app/user/${user?.email}`)
+                .then(res => res.json())
+                .then(data => setLoinUser(data))
+
+        }
+    }, [user?.email])
 
 
     const menuItems = <>
@@ -60,7 +72,7 @@ const Navbar = () => {
                             <div className="dropdown dropdown-end">
                                 <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                                     <div className="w-10 rounded-full">
-                                        <img src="https://placeimg.com/80/80/people" alt='' />
+                                        <img src={loginUser?.photoURL} alt='' />
                                     </div>
                                 </label>
                                 <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">

@@ -17,7 +17,7 @@ const PostModal = () => {
 
     useEffect(() => {
         if (user?.email) {
-            fetch(`http://localhost:5000/user/${user?.email}`)
+            fetch(`https://showfeed-server.vercel.app/user/${user?.email}`)
                 .then(res => res.json())
                 .then(data => setLoginUser(data))
         }
@@ -51,11 +51,11 @@ const PostModal = () => {
                         img: imageData.data.url,
                         userImage: loginUser.photoURL,
                         userName: loginUser.displayName,
-                        likes: [{ user: user.uid }],
+                        likes: [],
                         date: postDate,
                         time: posTime
                     }
-                    fetch('http://localhost:5000/post', {
+                    fetch('https://showfeed-server.vercel.app/post', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json'
@@ -97,7 +97,7 @@ const PostModal = () => {
 
                         <div className="modal-action  ">
                             <button className='w-full'>
-                                <label type='submit' htmlFor="post-modal" className="btn w-96  ">Post submit</label>
+                                <label type='submit' htmlFor="post-modal" className="btn ">Post submit</label>
                             </button>
                         </div>
                     </form>

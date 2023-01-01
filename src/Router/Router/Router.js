@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
             {
                 path: '/post/:id',
                 element: <PrivateRouter><PostView></PostView></PrivateRouter>,
-                loader: ({ params }) => fetch(`http://localhost:5000/post/${params.id}`),
+                loader: ({ params }) => fetch(`https://showfeed-server.vercel.app/post/${params.id}`),
 
             }
 

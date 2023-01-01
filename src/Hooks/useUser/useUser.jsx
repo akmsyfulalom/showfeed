@@ -6,7 +6,7 @@ const useUser = email => {
     const [isUserLoading, setIsUserLoading] = useState(true);
     useEffect(() => {
         if (email) {
-            fetch(`http://localhost:5000/users/sfUser/${email}`)
+            fetch(`https://showfeed-server.vercel.app/users/sfUser/${email}`)
                 .then(res => res.json())
                 .then(data => {
                     console.log(data);
